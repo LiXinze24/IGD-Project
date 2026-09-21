@@ -1,0 +1,11 @@
+{
+  "deepcad_cq_train": {
+    "file_name": "deepcad_cq_train.json",
+    "formatting": "alpaca",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    }
+  }
+}

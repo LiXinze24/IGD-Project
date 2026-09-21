@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IGD TP coordination decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "action",
+    "summary"
+  ],
+  "properties": {
+    "action": {
+      "enum": [
+        "dispatch",
+        "finish",
+        "abort"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000,
+      "pattern": "\\S"
+    },
+    "task_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+    },
+    "agent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "dispatch"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "task_id",
+          "agent_id"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "agent_id": {
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "task_id": {
+            "type": "null"
+          },
+          "agent_id": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

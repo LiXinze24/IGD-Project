@@ -1,0 +1,13 @@
+{
+  "evaporation": 0.2,
+  "reinforcement": 1.0,
+  "initial_pheromone": 1.0,
+  "weights": {
+    "confidence": 0.2,
+    "history": 0.2,
+    "plan": 0.2,
+    "capability": 0.2,
+    "time": 0.2
+  }
+}
+

@@ -1,0 +1,45 @@
+{
+  "requirement": "Design a four-segment gear shaft with a rounded-profile tooth array and a keyway, using the supplied dimensions in millimetres.",
+  "tasks": [
+    {
+      "id": "design",
+      "role": "PD",
+      "description": "Establish and validate the gear-shaft dimensions.",
+      "dependencies": [],
+      "inputs": {
+        "segment_diameters_mm": [
+          40.0,
+          57.0,
+          40.0,
+          32.0
+        ],
+        "segment_lengths_mm": [
+          25.0,
+          48.0,
+          55.0,
+          60.0
+        ],
+        "tooth_count": 25,
+        "tooth_length_mm": 8.5,
+        "tooth_width_mm": 4.0,
+        "gear_face_width_mm": 37.0,
+        "gear_start_offset_mm": 5.0,
+        "keyway_length_mm": 30.0,
+        "keyway_width_mm": 10.0,
+        "keyway_depth_mm": 4.0,
+        "keyway_end_margin_mm": 5.0
+      }
+    },
+    {
+      "id": "gear_shaft",
+      "role": "PM",
+      "description": "Model the four shaft segments, tooth array and keyway in CadQuery.",
+      "dependencies": [
+        "design"
+      ],
+      "inputs": {
+        "part": "gear_shaft"
+      }
+    }
+  ]
+}

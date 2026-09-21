@@ -1,0 +1,17 @@
+include .gitignore README.md README.zh-CN.md LICENSE CITATION.cff .env.example
+recursive-include docs *.md
+recursive-include schemas *.json
+recursive-include examples *.py *.json
+recursive-include tools *.py
+recursive-include tests *.py
+include .github/workflows/ci.yml
+include training/llamafactory/README.md
+include training/llamafactory/qwen2_5coder_lora_s1_sft.yaml
+include training/llamafactory/dataset_info.example.json
+global-exclude __pycache__ *.py[cod] .env *.log
+prune outputs
+prune .private
+prune .venv
+prune data
+prune checkpoints
+prune models
