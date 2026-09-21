@@ -183,5 +183,3 @@ tools/                Source runners and release packaging
 ## License
 
 The public code uses the [MIT License](LICENSE). Private workflows and associated assets are outside this distribution.
-
-Related project: [Bee-MAS](https://github.com/LiXinze24/Bee-MAS).
