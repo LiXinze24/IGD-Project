@@ -68,12 +68,12 @@ class RegressionTests(unittest.TestCase):
             path = Path(directory) / "already-a-file"
             path.write_text("existing content", encoding="utf-8")
             with patch("igd.backends.dify.DifyBackend.plan") as planner, redirect_stderr(io.StringIO()):
-                self.assertEqual(main(["run", "--requirement", "gear shaft", "--output", str(path)]), 2)
+                self.assertEqual(main(["run", "--requirement", "stepped shaft", "--output", str(path)]), 2)
             planner.assert_not_called()
             self.assertEqual(path.read_text(), "existing content")
             with patch("igd.artifacts.tempfile.TemporaryFile", side_effect=PermissionError), \
                  patch("igd.backends.dify.DifyBackend.plan") as planner, redirect_stderr(io.StringIO()):
-                self.assertEqual(main(["run", "--requirement", "gear shaft", "--output", directory]), 2)
+                self.assertEqual(main(["run", "--requirement", "stepped shaft", "--output", directory]), 2)
             planner.assert_not_called()
 
     def test_tp_http_failure_returns_report_without_private_details(self):
@@ -108,6 +108,6 @@ class RegressionTests(unittest.TestCase):
             env = {"IGD_DIFY_BASE_URL": server.url.removesuffix("/workflows/run")}
             env.update({f"IGD_DIFY_{r}_API_KEY": "test-only-token" for r in ("TP", "PD", "PM")})
             with patch.dict("os.environ", env, clear=True), redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-                code = main(["run", "--requirement", "gear shaft", "--output", directory])
+                code = main(["run", "--requirement", "stepped shaft", "--output", directory])
             self.assertEqual(code, 1)
             self.assertEqual(len(server.requests), 2)

@@ -17,7 +17,10 @@ class ReleaseTests(unittest.TestCase):
             for name in ROOT_FILES + EXTRA_FILES:
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text("", encoding="utf-8")
+                if path.suffix == ".png":
+                    path.write_bytes(b"\x89PNG\r\n\x1a\n")
+                else:
+                    path.write_text("", encoding="utf-8")
             for name in DIRECTORIES:
                 (root / name).mkdir(parents=True, exist_ok=True)
             (root / "src/igd/__init__.py").write_text('__version__ = "0.1.0"\n', encoding="utf-8")
@@ -33,7 +36,7 @@ class ReleaseTests(unittest.TestCase):
                 path.write_text("private-data", encoding="utf-8")
             files = public_files(root)
             self.assertNotIn(root / ".env", files)
-            self.assertFalse(any("private-data" in p.read_text(encoding="utf-8") for p in files))
+            self.assertFalse(any(b"private-data" in p.read_bytes() for p in files))
             archive = package(root)
             before = archive.read_bytes()
             self.assertEqual(package(root).read_bytes(), before)
@@ -50,7 +53,10 @@ class ReleaseTests(unittest.TestCase):
             for name in ROOT_FILES + EXTRA_FILES:
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text("", encoding="utf-8")
+                if path.suffix == ".png":
+                    path.write_bytes(b"\x89PNG\r\n\x1a\n")
+                else:
+                    path.write_text("", encoding="utf-8")
             for name in DIRECTORIES:
                 (root / name).mkdir(parents=True, exist_ok=True)
             (root / "src/igd/key.py").write_text('TOKEN = "sk-' + 'a' * 30 + '"', encoding="utf-8")

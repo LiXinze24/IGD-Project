@@ -1,4 +1,4 @@
-"""Export and validate the shipped gear shaft using CadQuery."""
+"""Export and validate the shipped stepped shaft using CadQuery."""
 
 import argparse
 import json
@@ -21,16 +21,16 @@ def main():
     model = create_demo_geometry(p)
     checks = check_geometry(model, p)
     args.output.mkdir(parents=True, exist_ok=True)
-    path = args.output / "gear_shaft.step"
+    path = args.output / "shaft.step"
     cq.exporters.export(model, str(path))
     imported = cq.importers.importStep(str(path))
-    check_geometry(imported, p)
-    if not math.isclose(imported.val().Volume(), checks["volume_mm3"], rel_tol=1e-6):
+    imported_checks = check_geometry(imported, p)
+    if not math.isclose(imported_checks["volume_mm3"], checks["volume_mm3"], rel_tol=1e-6):
         raise RuntimeError("STEP round trip changed the solid volume")
     checks["step_round_trip"] = True
     (args.output / "geometry-checks.json").write_text(
         json.dumps(checks, indent=2) + "\n", encoding="utf-8")
-    print(f"Checked and exported the gear shaft to {args.output.resolve()}")
+    print(f"Checked and exported the stepped shaft to {args.output.resolve()}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 include .gitignore README.md README.zh-CN.md LICENSE CITATION.cff .env.example
 recursive-include docs *.md
+include docs/assets/shaft-preview.png
 recursive-include schemas *.json
 recursive-include examples *.py *.json
 recursive-include tools *.py

@@ -14,6 +14,7 @@ ROOT_FILES = (
     "README.zh-CN.md", "LICENSE", "CITATION.cff", "MANIFEST.in",
 )
 EXTRA_FILES = (
+    'docs/assets/shaft-preview.png',
     'training/llamafactory/README.md',
     'training/llamafactory/qwen2_5coder_lora_s1_sft.yaml',
     'training/llamafactory/dataset_info.example.json',
@@ -56,6 +57,10 @@ def public_files(root: Path) -> list[Path]:
     for path in result:
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise ValueError("Source release does not accept links outside the project")
+        if path.suffix == ".png":
+            if not path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
+                raise ValueError(f"Invalid release image: {path.relative_to(root)}")
+            continue
         content = path.read_text(encoding="utf-8")
         if any(pattern.search(content) for pattern in SECRET_PATTERNS):
             raise ValueError(f"Credential-shaped content in {path.relative_to(root)}")

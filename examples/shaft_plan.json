@@ -1,0 +1,52 @@
+{
+  "requirement": "Design a four-segment stepped shaft with two keyways, using the supplied dimensions in millimetres.",
+  "tasks": [
+    {
+      "id": "design",
+      "role": "PD",
+      "description": "Establish and validate the shaft dimensions and keyway positions.",
+      "dependencies": [],
+      "inputs": {
+        "segment_diameters_mm": [
+          60.0,
+          70.0,
+          60.0,
+          55.0
+        ],
+        "segment_lengths_mm": [
+          16.95,
+          96.0,
+          69.45,
+          51.35
+        ],
+        "keyways": [
+          {
+            "segment": 2,
+            "length_mm": 22.0,
+            "width_mm": 14.0,
+            "depth_mm": 6.0,
+            "end_margin_mm": 36.0
+          },
+          {
+            "segment": 4,
+            "length_mm": 34.0,
+            "width_mm": 10.0,
+            "depth_mm": 5.0,
+            "end_margin_mm": 5.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "shaft",
+      "role": "PM",
+      "description": "Model the four shaft segments and two keyways in CadQuery.",
+      "dependencies": [
+        "design"
+      ],
+      "inputs": {
+        "part": "shaft"
+      }
+    }
+  ]
+}

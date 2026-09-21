@@ -4,25 +4,31 @@ Requests and outputs use finite JSON values and UTF-8-encodable Unicode strings.
 
 ## Initial task plan
 
-See [plan.schema.json](../schemas/plan.schema.json) and [gear_shaft_plan.json](../examples/gear_shaft_plan.json).
+See [plan.schema.json](../schemas/plan.schema.json) and [shaft_plan.json](../examples/shaft_plan.json).
 
 ```json
 {
-  "requirement": "Design a gear shaft.",
+  "requirement": "Design a stepped shaft.",
   "tasks": [
     {
       "id": "design",
       "role": "PD",
-      "description": "Determine the gear-shaft dimensions.",
+      "description": "Determine the shaft dimensions.",
       "dependencies": [],
-      "inputs": {"length_unit": "mm"}
+      "inputs": {
+        "length_unit": "mm"
+      }
     },
     {
-      "id": "gear_shaft",
+      "id": "shaft",
       "role": "PM",
-      "description": "Model the gear shaft from the design result.",
-      "dependencies": ["design"],
-      "inputs": {"part": "gear_shaft"}
+      "description": "Model the stepped shaft from the design result.",
+      "dependencies": [
+        "design"
+      ],
+      "inputs": {
+        "part": "shaft"
+      }
     }
   ]
 }
@@ -41,7 +47,7 @@ The TP input uses schema version 2 and a phase:
   "schema_version": 2,
   "role": "TP",
   "phase": "plan",
-  "requirement": "Design a gear shaft."
+  "requirement": "Design a stepped shaft."
 }
 ```
 
@@ -59,7 +65,7 @@ Before every functional dispatch and after the final functional result, TP recei
   "state": {
     "round": 1,
     "plan": {
-      "requirement": "Determine gear-shaft dimensions.",
+      "requirement": "Determine shaft dimensions.",
       "tasks": [
         {
           "id": "design",
@@ -71,11 +77,17 @@ Before every functional dispatch and after the final functional result, TP recei
       ]
     },
     "task_states": {
-      "design": {"status": "pending", "role": "PD", "error_code": null}
+      "design": {
+        "status": "pending",
+        "role": "PD",
+        "error_code": null
+      }
     },
     "results": {},
     "last_execution": null,
-    "pheromones": {"design": 1.0},
+    "pheromones": {
+      "design": 1.0
+    },
     "proposals": [
       {
         "agent_id": "pd-agent",
@@ -90,7 +102,10 @@ Before every functional dispatch and after the final functional result, TP recei
         "concentration": 1.9
       }
     ],
-    "selection": {"task_id": "design", "agent_id": "pd-agent"},
+    "selection": {
+      "task_id": "design",
+      "agent_id": "pd-agent"
+    },
     "all_tasks_succeeded": false
   }
 }
@@ -116,7 +131,7 @@ After all tasks succeed:
 ```json
 {
   "action": "finish",
-  "summary": "The gear-shaft design parameters and CadQuery model are complete."
+  "summary": "The shaft design parameters and CadQuery model are complete."
 }
 ```
 
@@ -133,21 +148,52 @@ PD, PM and PA retain schema version 1. Each receives the task and full validated
   "schema_version": 1,
   "role": "PM",
   "task": {
-    "id": "gear_shaft",
+    "id": "shaft",
     "role": "PM",
-    "description": "Model the gear shaft from its dimensions.",
-    "dependencies": ["design"],
-    "inputs": {"part": "gear_shaft"}
+    "description": "Model the stepped shaft from its dimensions.",
+    "dependencies": [
+      "design"
+    ],
+    "inputs": {
+      "part": "shaft"
+    }
   },
   "dependency_results": {
     "design": {
-      "summary": "Nominal gear-shaft dimensions.",
+      "summary": "Nominal shaft dimensions.",
       "parameters": {
-        "segment_diameters_mm": [40, 57, 40, 32],
-        "segment_lengths_mm": [25, 48, 55, 60],
-        "tooth_count": 25
+        "segment_diameters_mm": [
+          60.0,
+          70.0,
+          60.0,
+          55.0
+        ],
+        "segment_lengths_mm": [
+          16.95,
+          96.0,
+          69.45,
+          51.35
+        ],
+        "keyways": [
+          {
+            "segment": 2,
+            "length_mm": 22.0,
+            "width_mm": 14.0,
+            "depth_mm": 6.0,
+            "end_margin_mm": 36.0
+          },
+          {
+            "segment": 4,
+            "length_mm": 34.0,
+            "width_mm": 10.0,
+            "depth_mm": 5.0,
+            "end_margin_mm": 5.0
+          }
+        ]
       },
-      "units": {"length": "mm"}
+      "units": {
+        "length": "mm"
+      }
     }
   }
 }

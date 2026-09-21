@@ -208,7 +208,7 @@ class CLITests(unittest.TestCase):
             for role in ("TP", "PD", "PM"):
                 env[f"IGD_DIFY_{role}_API_KEY"] = "test-only-token"
             with patch.dict("os.environ", env, clear=True), redirect_stdout(io.StringIO()):
-                code = main(["run", "--requirement", "A four-segment gear shaft", "--output", directory])
+                code = main(["run", "--requirement", "A four-segment stepped shaft", "--output", directory])
             self.assertEqual(code, 0)
             self.assertEqual(len(server.requests), 6)
             report = json.loads(next(Path(directory).glob("*/run.json")).read_text(encoding="utf-8"))
@@ -219,7 +219,7 @@ class CLITests(unittest.TestCase):
             self.assertEqual([json.loads(r[2]["inputs"]["request"])["role"] for r in server.requests],
                              ["TP", "TP", "PD", "TP", "PM", "TP"])
             self.assertEqual(set(server.coordinate_states[1]["results"]), {"design"})
-            self.assertIn("cadquery_code", server.coordinate_states[2]["results"]["gear_shaft"])
+            self.assertIn("cadquery_code", server.coordinate_states[2]["results"]["shaft"])
             self.assertTrue(report["metrics"]["total_token_usage_complete"])
             modelling_call = json.loads(server.requests[-2][2]["inputs"]["request"])
             self.assertEqual(set(modelling_call["dependency_results"]), {"design"})
@@ -239,7 +239,7 @@ class CLITests(unittest.TestCase):
                 code = main(["run", "--plan", str(plan_path), "--output", str(root / "out")])
             self.assertEqual(code, 1)
             report = json.loads(next((root / "out").glob("*/run.json")).read_text(encoding="utf-8"))
-            self.assertEqual(report["tasks"]["gear_shaft"]["status"], "blocked")
+            self.assertEqual(report["tasks"]["shaft"]["status"], "blocked")
             self.assertEqual(len(server.requests), 3)
 
     def test_missing_key_fails_before_any_request(self):

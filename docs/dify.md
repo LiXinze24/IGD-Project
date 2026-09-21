@@ -28,7 +28,7 @@ Existing deployments can map their own internal fields at this boundary. The pub
 | `IGD_DIFY_USER` | End-user identifier, default `igd-client` |
 | `IGD_DIFY_TIMEOUT_SECONDS` | Socket timeout, 1-600 seconds; default 180 |
 
-`<ROLE>` is TP, PD, PM or PA. TP is required for both requirement and saved-plan runs. Functional keys are required for roles present in the plan. The gear-shaft example needs TP, PD and PM; an assembly task also needs PA.
+`<ROLE>` is TP, PD, PM or PA. TP is required for both requirement and saved-plan runs. Functional keys are required for roles present in the plan. The shaft example needs TP, PD and PM; an assembly task also needs PA.
 
 A requirement run calls TP first to discover the task roles, then validates the corresponding functional configuration. A saved-plan run validates all required keys before dispatch.
 
@@ -41,7 +41,7 @@ The adapter POSTs to `/workflows/run` or a configured version-specific `/workflo
 ```json
 {
   "inputs": {
-    "request": "{\"schema_version\":2,\"role\":\"TP\",\"phase\":\"plan\",\"requirement\":\"Design a gear shaft.\"}"
+    "request": "{\"schema_version\":2,\"role\":\"TP\",\"phase\":\"plan\",\"requirement\":\"Design a stepped shaft.\"}"
   },
   "response_mode": "blocking",
   "user": "igd-client"
@@ -50,7 +50,7 @@ The adapter POSTs to `/workflows/run` or a configured version-specific `/workflo
 
 The initial TP result is a task plan. Later calls have `phase: "coordinate"` and a `state` containing the plan, task states, validated results, scored proposals, current field and ACBAC-selected dispatch. Their result is a `dispatch`, `finish` or `abort` decision.
 
-For the two-task gear-shaft plan, a normal requirement run has this sequence:
+For the two-task shaft plan, a normal requirement run has this sequence:
 
 ```text
 TP plan

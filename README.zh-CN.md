@@ -25,7 +25,7 @@ flowchart TD
 
 专业设计、CRP/CGP 建模、Checker 迭代、MKG 检索和 GART 装配通过私有 Dify 工作流接入。其内部提示词、工作流定义、知识资产和模型权重不随本仓库发布。
 
-## 齿轮轴示例
+## 阶梯轴示例
 
 需要 Python 3.11 或更高版本。协作框架本身没有第三方运行依赖。
 
@@ -40,28 +40,34 @@ igd demo
 python tools/run_igd.py demo
 ```
 
-默认几何包含四段阶梯轴、25 齿圆周阵列和一个键槽：
+默认几何为一根四段阶梯轴，第二段和第四段各有一处键槽：
+
+![双键槽阶梯轴](docs/assets/shaft-preview.png)
 
 | 参数 | 默认值 |
 | --- | --- |
-| 四段轴直径 | 40、57、40、32 mm |
-| 四段轴长 | 25、48、55、60 mm |
-| 总轴长 | 188 mm |
-| 齿形长度 / 宽度 | 8.5 / 4 mm |
-| 齿宽（轴向） | 37 mm，位于第二段轴 |
-| 键槽长 / 宽 / 深 | 30 / 10 / 4 mm，位于第四段轴 |
+| 四段轴直径 | 60、70、60、55 mm |
+| 四段实际轴长 | 16.95、96、69.45、51.35 mm |
+| 总轴长 | 233.75 mm |
+| 第二段键槽长 / 宽 / 深 | 22 / 14 / 6 mm |
+| 第二段键槽距该段末端 | 36 mm |
+| 第四段键槽长 / 宽 / 深 | 34 / 10 / 5 mm |
+| 第四段键槽距轴端 | 5 mm |
+| 第四段键槽距轴肩 | 12.35 mm |
 
-齿形采用圆角槽轮廓，是参数化几何示例，不是渐开线齿轮规格。轴向坐标从零开始，轴段参数表示实际长度，键槽距轴端 5 mm。
+轴向坐标从零开始，四段按实际长度连续连接。两处键槽均朝向 +Y，完整位于各自轴段内。参数中的 `keyways[].segment` 为从 1 到 4 的轴段编号，`end_margin_mm` 为键槽距所在轴段正 Z 方向末端的距离。
+
+[shaft.py](examples/shaft.py) 提供默认几何的独立 CadQuery 源码，可在 CAD 查看器中显示其 `result` 对象。
 
 本地 TP 按示例规则生成 PD 和 PM 任务，并持续参与派发、接收结果及最终汇总。一次正常运行包含一次初始规划和三次协调调用。该示例为单个零件；多零件任务按计划启用 PA。
 
 本地后端标记为 `demo`，无需 API Key。修改尺寸可使用：
 
 ```console
-igd demo --parameters examples/gear_shaft_parameters.json
+igd demo --parameters examples/shaft_parameters.json
 ```
 
-每次运行会新建 `outputs/run-.../`，包含 `run.json`、设计参数、齿轮轴结果和 `gear_shaft.py`。运行报告保存每轮 TP 决定、任务结果、提案、信息素、耗时和已知 token 用量。
+每次运行会新建 `outputs/run-.../`，包含 `run.json`、设计参数、阶梯轴结果和 `shaft.py`。运行报告保存每轮 TP 决定、任务结果、提案、信息素、耗时和已知 token 用量。
 
 需要导出示例的 STEP 几何文件时，安装可选 CAD 依赖并运行随附的导出程序：
 
@@ -70,7 +76,7 @@ python -m pip install -e ".[cad]"
 python examples/export_demo.py
 ```
 
-结果位于 `outputs/demo-cad/`，包括 `gear_shaft.step` 和 `geometry-checks.json`，检查实体有效性、尺寸、齿形、键槽及 STEP 回读。导出程序使用仓库内置的示例构造函数；运行框架保存工作流生成的 Python 源码，不自动执行。
+结果位于 `outputs/demo-cad/`，包括 `shaft.step` 和 `geometry-checks.json`，检查实体有效性、尺寸、两处键槽及 STEP 回读。导出程序使用仓库内置的示例构造函数；运行框架保存工作流生成的 Python 源码，不自动执行。
 
 ## Dify 接入
 
@@ -79,25 +85,25 @@ python examples/export_demo.py
 主入口从设计需求开始：
 
 ```console
-igd run --requirement "设计一个带齿阵列和键槽的四段阶梯齿轮轴。" --env-file .env
+igd run --requirement "设计一根带两处键槽的四段阶梯轴。" --env-file .env
 ```
 
 TP 先完成初始任务分解；随后每轮再次被调用，接收任务状态、完整的已验证结果、提案和信息素。最后一次协调接收最终建模结果，并返回完成摘要。
 
 ### JSON task plan 是什么？
 
-[gear_shaft_plan.json](examples/gear_shaft_plan.json) 是保存下来的初始任务列表，描述任务编号、角色、输入和依赖关系。它与任务图的关系是：
+[shaft_plan.json](examples/shaft_plan.json) 是保存下来的初始任务列表，描述任务编号、角色、输入和依赖关系。它与任务图的关系是：
 
 **JSON 任务计划 → 检查编号、角色、依赖和环路 → 内存中的可执行任务图。**
 
 “Validated task graph”表示任务结构已经通过校验，不是独立 Agent，也不表示设计或几何已经正确。
 
 ```console
-igd validate-plan examples/gear_shaft_plan.json
-igd run --plan examples/gear_shaft_plan.json --env-file .env
+igd validate-plan examples/shaft_plan.json
+igd run --plan examples/shaft_plan.json --env-file .env
 ```
 
-文件入口只提供初始任务分解，后续 TP 协调仍会执行，因此也需要 TP Key。齿轮轴计划使用 TP、PD、PM；含装配任务的计划另需 PA Key。
+文件入口只提供初始任务分解，后续 TP 协调仍会执行，因此也需要 TP Key。阶梯轴计划使用 TP、PD、PM；含装配任务的计划另需 PA Key。
 
 返回码：`0` 为成功完成，`1` 为任务执行或协调失败，`2` 为配置、初始规划或文件读写错误。失败任务阻塞其后继，独立任务可以继续；TP 中断会取消尚未执行的任务。`--max-rounds` 默认限制为 1001 轮。
 

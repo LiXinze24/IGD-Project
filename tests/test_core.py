@@ -88,10 +88,32 @@ class ContractTests(unittest.TestCase):
                 ExecutionResult(design_result().payload, quality, tokens).validated(Role.PD)
 
     def test_dimension_constraints(self):
-        for patch in ({"segment_diameters_mm": [-1, 57, 40, 32]}, {"tooth_count": 2},
-                      {"gear_face_width_mm": 60}, {"keyway_depth_mm": float("inf")}):
+        for patch in ({"segment_diameters_mm": [-1, 70, 60, 55]},
+                      {"segment_lengths_mm": [20, 100, 70]}, {"keyways": []}):
             with self.subTest(patch=patch), self.assertRaises(ValidationError):
                 validate_parameters(DEFAULT_PARAMETERS | patch)
+
+    def test_keyway_dimensions_and_placement(self):
+        for patch in ({"segment": True}, {"segment": 5}, {"segment": 2},
+                      {"length_mm": 60}, {"width_mm": 35},
+                      {"depth_mm": float("inf")}, {"depth_mm": 28},
+                      {"depth_mm": 0.1}, {"end_margin_mm": 0}):
+            p = copy.deepcopy(DEFAULT_PARAMETERS)
+            p["keyways"][1].update(patch)
+            with self.subTest(patch=patch), self.assertRaises(ValidationError):
+                validate_parameters(p)
+
+    def test_shipped_example_assets_match_the_runtime(self):
+        from igd.geometry import shaft_source
+        root = Path(__file__).resolve().parents[1]
+        parameters = json.loads((root / "examples/shaft_parameters.json").read_text(encoding="utf-8"))
+        plan = json.loads((root / "examples/shaft_plan.json").read_text(encoding="utf-8"))
+        self.assertEqual(parameters, DEFAULT_PARAMETERS)
+        self.assertEqual(plan, demo_plan().to_dict())
+        self.assertEqual((root / "examples/shaft.py").read_text(encoding="utf-8"), shaft_source(parameters))
+        isolated = validate_parameters(parameters)
+        isolated["keyways"][0]["depth_mm"] = 1
+        self.assertEqual(parameters["keyways"][0]["depth_mm"], 6)
 
 
 class ACBACTests(unittest.TestCase):
@@ -143,9 +165,9 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(report["status"], "succeeded")
         starts = [event["task_id"] for event in report["events"] if event["event"] == "started"]
         self.assertEqual(starts[0], "design")
-        self.assertEqual(starts[-1], "gear_shaft")
-        self.assertEqual(starts, ["design", "gear_shaft"])
-        self.assertIn("range(p[\"tooth_count\"])", report["tasks"]["gear_shaft"]["result"]["payload"]["cadquery_code"])
+        self.assertEqual(starts[-1], "shaft")
+        self.assertEqual(starts, ["design", "shaft"])
+        self.assertIn("for key in p[\"keyways\"]:", report["tasks"]["shaft"]["result"]["payload"]["cadquery_code"])
         self.assertEqual([call["decision"]["action"] for call in report["tp"]["calls"]],
                          ["dispatch", "dispatch", "finish"])
         self.assertEqual(report["metrics"]["known_execution_tokens"], 0)
@@ -216,7 +238,7 @@ class EngineTests(unittest.TestCase):
             first = save_report(report, Path(directory))
             second = save_report(report, Path(directory))
             self.assertNotEqual(first, second)
-            self.assertTrue((first / "artifacts" / "gear_shaft.py").is_file())
+            self.assertTrue((first / "artifacts" / "shaft.py").is_file())
             saved = json.loads((first / "run.json").read_text(encoding="utf-8"))
             self.assertEqual(saved["status"], "succeeded")
             self.assertFalse((first / "run.json.tmp").exists())

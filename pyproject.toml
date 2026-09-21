@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "igd-framework"
-version = "0.2.1"
+version = "0.3.0"
 description = "Agent coordination and workflow interfaces for Intelligent Generative Design"
 readme = "README.md"
 requires-python = ">=3.11"

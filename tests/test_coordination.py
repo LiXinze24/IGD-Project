@@ -33,11 +33,11 @@ class CoordinationTests(unittest.TestCase):
         first, second, final = coordinator.states
         self.assertEqual(first["results"], {})
         self.assertEqual(first["selection"]["task_id"], "design")
-        self.assertEqual(second["selection"]["task_id"], "gear_shaft")
+        self.assertEqual(second["selection"]["task_id"], "shaft")
         self.assertEqual(set(second["results"]), {"design"})
         self.assertEqual(second["last_execution"]["task_id"], "design")
         self.assertAlmostEqual(second["pheromones"]["design"], 0.8)
-        self.assertIn("cadquery_code", final["results"]["gear_shaft"])
+        self.assertIn("cadquery_code", final["results"]["shaft"])
         self.assertTrue(final["all_tasks_succeeded"])
         self.assertIsNone(final["selection"])
         self.assertIsNotNone(report["tp"]["summary"])
@@ -55,7 +55,7 @@ class CoordinationTests(unittest.TestCase):
 
     def test_dispatch_cannot_bypass_dependencies_or_field_selection(self):
         coordinator = RecordingCoordinator(lambda state:
-            CoordinationResult("dispatch", "Skip design.", "gear_shaft", "pm-agent"))
+            CoordinationResult("dispatch", "Skip design.", "shaft", "pm-agent"))
         backend = DemoBackend()
         report = TPAgent([PDAgent(backend), PMAgent(backend)], coordinator=coordinator).run(demo_plan())
         self.assertEqual(report["tp"]["error_code"], "invalid_tp_decision")
@@ -70,7 +70,7 @@ class CoordinationTests(unittest.TestCase):
         report = TPAgent([PDAgent(backend), PMAgent(backend)], coordinator=coordinator).run(demo_plan())
         self.assertEqual(report["status"], "failed")
         self.assertEqual(report["tasks"]["design"]["status"], "succeeded")
-        self.assertEqual(report["tasks"]["gear_shaft"]["status"], "cancelled")
+        self.assertEqual(report["tasks"]["shaft"]["status"], "cancelled")
         self.assertEqual(report["metrics"]["executed_tasks"], 1)
         self.assertEqual(report["tp"]["error_code"], "tp_aborted")
 
@@ -94,7 +94,7 @@ class CoordinationTests(unittest.TestCase):
         self.assertEqual(report["status"], "failed")
         self.assertEqual(report["tp"]["error_code"], "round_limit")
         self.assertEqual(report["metrics"]["executed_tasks"], 1)
-        self.assertEqual(report["tasks"]["gear_shaft"]["status"], "cancelled")
+        self.assertEqual(report["tasks"]["shaft"]["status"], "cancelled")
 
     def test_coordination_state_is_isolated(self):
         policy = LocalCoordinator()
@@ -108,7 +108,7 @@ class CoordinationTests(unittest.TestCase):
         report = TPAgent([PDAgent(backend), PMAgent(backend)],
                          coordinator=RecordingCoordinator(coordinate)).run(demo_plan())
         self.assertEqual(report["status"], "succeeded")
-        self.assertEqual(report["plan"]["tasks"][0]["inputs"]["tooth_count"], 25)
+        self.assertEqual(report["plan"]["tasks"][0]["inputs"]["keyways"][1]["end_margin_mm"], 5)
 
     def test_decision_contract_rejects_invalid_fields(self):
         for value in ({"action": "skip", "summary": "x"},
